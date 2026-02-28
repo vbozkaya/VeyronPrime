@@ -1,0 +1,10 @@
+{
+  "name": "veyron-panel-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Panel + API (Supabase yok; Turso/veritabanı)",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@libsql/client": "^0.14.0"
+  }
+}

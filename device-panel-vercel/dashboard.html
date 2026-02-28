@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veyron Prime — Playlist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0b0f;
+      --bg-elevated: #111318;
+      --surface: #16181e;
+      --surface-hover: #1c1f28;
+      --border: #2a2d38;
+      --text: #f0f2f5;
+      --text-muted: #7d8292;
+      --accent: #e8b923;
+      --accent-dim: rgba(232, 185, 35, 0.15);
+      --accent-hover: #f0c63a;
+      --success: #2dd4a0;
+      --error: #f25c54;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+      --glow: 0 0 60px rgba(232, 185, 35, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Outfit", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 0;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 100% 60% at 50% -20%, rgba(232, 185, 35, 0.06), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(232, 185, 35, 0.04), transparent 45%);
+    }
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .logo-link span { color: var(--accent); }
+
+    .header-logo {
+      height: 32px;
+      width: auto;
+      border-radius: 6px;
+      vertical-align: middle;
+    }
+
+    .logout {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .logout:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    .main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      margin: 0 0 6px;
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: "";
+      width: 4px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .card-subtitle {
+      margin: 0 0 20px;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .form-row-btn .btn {
+      width: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.875rem;
+      color: var(--text);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .form-row input {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 14px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.875rem;
+      color: var(--text);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.05s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--accent-hover); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    .playlist-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .playlist-count {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .channel-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .channel-group {
+      margin-bottom: 20px;
+    }
+
+    .channel-group-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin: 0 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+      background: var(--bg-elevated);
+      border: 1px solid transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .channel-item:hover {
+      background: var(--surface-hover);
+      border-color: var(--border);
+    }
+
+    .channel-name {
+      flex: 1;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      min-width: 0;
+    }
+
+    .channel-url {
+      flex: 1.5;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+    }
+
+    .empty-state p { margin: 0 0 8px; }
+
+    .loading-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s;
+      z-index: 100;
+      max-width: 90vw;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success { background: var(--success); color: var(--bg); }
+    .toast.error { background: var(--error); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <a href="index.html" class="logo-link">
+        <img src="../assets/images/icon.jpg" alt="Veyron Prime" class="header-logo" />
+        Veyron<span> Prime</span>
+      </a>
+      <span style="color: var(--border);">/</span>
+      <span style="font-size: 0.9375rem; color: var(--text-muted);">Playlist</span>
+    </div>
+    <a href="index.html" class="logout" id="logoutBtn">Çıkış</a>
+  </header>
+
+  <main class="main">
+    <div class="card">
+      <h3 class="card-title">Playlist ekle veya güncelle</h3>
+      <p class="card-subtitle">Sadece M3U linki kaydedilir. İçerik cihazda "Güncelle" ile indirilip listelenir.</p>
+      <form id="m3uForm" onsubmit="savePlaylist(event); return false;">
+        <div class="form-group">
+          <label for="playlistName">Playlist adı</label>
+          <input type="text" id="playlistName" placeholder="Örn: Ana liste" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="m3uUrl">M3U URL</label>
+          <input type="url" id="m3uUrl" placeholder="https://...m3u veya .m3u8" autocomplete="off" />
+        </div>
+        <div class="form-row form-row-btn">
+          <button type="submit" class="btn" id="saveBtn">Kaydet</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="playlist-toolbar">
+        <h3 class="card-title" style="margin: 0;">Mevcut playlist</h3>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="playlist-count" id="playlistCount">—</span>
+          <button type="button" class="btn btn-ghost" id="refreshBtn">Yenile</button>
+        </div>
+      </div>
+      <p class="card-subtitle" style="margin-top: -8px; margin-bottom: 16px;">Cihazınıza kayıtlı kanallar.</p>
+      <div id="playlistContent">
+        <div class="loading-state" id="loadingState">Yükleniyor…</div>
+        <ul class="channel-list" id="channelList" style="display: none;"></ul>
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <p>Henüz kanal yok.</p>
+          <p style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra birkaç saniye bekleyip "Yenile"ye basın.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    var API_BASE = (typeof window !== "undefined" && window.location.origin)
+      ? window.location.origin + "/api"
+      : "/api";
+
+    function getCredentials() {
+      try {
+        var id = sessionStorage.getItem("veyron_device_id");
+        var key = sessionStorage.getItem("veyron_device_key");
+        if (id && key) return { deviceId: id, deviceKey: key };
+      } catch (e) {}
+      return null;
+    }
+
+    function ensureAuth() {
+      if (!getCredentials()) {
+        window.location.href = "index.html";
+        return false;
+      }
+      return true;
+    }
+
+    function showToast(message, type) {
+      type = type || "success";
+      var toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "toast " + type + " show";
+      clearTimeout(toast._tid);
+      toast._tid = setTimeout(function() { toast.classList.remove("show"); }, 3200);
+    }
+
+    function backendPost(path, body, fetchOpts) {
+      var opts = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      };
+      if (fetchOpts && typeof fetchOpts === "object") {
+        if (fetchOpts.cache !== undefined) opts.cache = fetchOpts.cache;
+      }
+      return fetch(API_BASE + "/" + path, opts);
+    }
+
+    function parseM3uText(text) {
+      var live = [];
+      var lines = (text || "").split("\n").map(function(l) { return l.trim(); });
+      var currentName = "", currentLogo = "", currentGroup = "";
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (line.indexOf("#EXTINF") === 0) {
+          var nameMatch = line.match(/,(.*)$/);
+          currentName = nameMatch ? nameMatch[1].trim() : "";
+          var logoMatch = line.match(/tvg-logo="(.*?)"/);
+          currentLogo = logoMatch ? logoMatch[1] : "";
+          var groupMatch = line.match(/group-title="(.*?)"/);
+          currentGroup = groupMatch ? groupMatch[1] : "";
+          continue;
+        }
+        if (line.indexOf("http") === 0) {
+          live.push({
+            name: currentName || "Kanal " + (live.length + 1),
+            url: line.trim(),
+            group: currentGroup || "Genel"
+          });
+        }
+      }
+      return live;
+    }
+
+    function loadPlaylist(noCache) {
+      if (!ensureAuth()) return;
+      var creds = getCredentials();
+      var loadingEl = document.getElementById("loadingState");
+      var listEl = document.getElementById("channelList");
+      var emptyEl = document.getElementById("emptyState");
+      var countEl = document.getElementById("playlistCount");
+
+      loadingEl.style.display = "block";
+      listEl.style.display = "none";
+      emptyEl.style.display = "none";
+
+      var body = { deviceId: creds.deviceId, device_id: creds.deviceId };
+      if (noCache) body._t = Date.now();
+      var getOpts = noCache ? { cache: "no-store" } : undefined;
+      backendPost("get-content", body, getOpts)
+        .then(function(res) {
+          if (!res.ok) throw new Error("İçerik alınamadı");
+          return res.json();
+        })
+        .then(function(data) {
+          var live = extractLive(data);
+          if ((!live || live.length === 0) && data.m3u_url) {
+            return fetch(data.m3u_url, { method: "GET", redirect: "follow", credentials: "omit" })
+              .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error("M3U indirilemedi")); })
+              .then(function(m3uText) {
+                return parseM3uText(m3uText).map(function(item) {
+                  return { name: item.name, url: item.url, group: item.group || "Genel" };
+                });
+              })
+              .catch(function() { return []; });
+          }
+          return Promise.resolve(live);
+        })
+        .then(function(live) {
+          loadingEl.style.display = "none";
+          if (!Array.isArray(live) || live.length === 0) {
+            emptyEl.style.display = "block";
+            countEl.textContent = "0 kanal";
+            return;
+          }
+          var byGroup = {};
+          live.forEach(function(item) {
+            var g = (item.group || item.category_name || "").trim() || "Genel";
+            if (!byGroup[g]) byGroup[g] = [];
+            byGroup[g].push({
+              name: item.name || "Kanal",
+              url: item.url || item.stream_url || item.streamUrl || ""
+            });
+          });
+          var html = "";
+          Object.keys(byGroup).sort().forEach(function(group) {
+            html += '<li class="channel-group"><div class="channel-group-title">' + escapeHtml(group) + "</div>";
+            byGroup[group].forEach(function(ch) {
+              html += '<div class="channel-item">';
+              html += '<span class="channel-name">' + escapeHtml(ch.name) + "</span>";
+              html += '<span class="channel-url" title="' + escapeHtml(ch.url) + '">' + escapeHtml(ch.url) + "</span>";
+              html += "</div>";
+            });
+            html += "</li>";
+          });
+          listEl.innerHTML = html;
+          listEl.style.display = "block";
+          countEl.textContent = live.length + " kanal";
+        })
+        .catch(function(err) {
+          loadingEl.style.display = "none";
+          emptyEl.style.display = "block";
+          document.querySelector("#emptyState p").textContent = err.message || "Liste yüklenemedi.";
+          countEl.textContent = "—";
+        });
+    }
+
+    function extractLive(data) {
+      if (!data) return [];
+      if (Array.isArray(data.live) && data.live.length > 0) return data.live;
+      if (data.content_json && Array.isArray(data.content_json.live)) return data.content_json.live;
+      if (data.data) {
+        var d = data.data;
+        if (Array.isArray(d.live)) return d.live;
+        if (d.content_json && Array.isArray(d.content_json.live)) return d.content_json.live;
+      }
+      if (Array.isArray(data) && data.length > 0) {
+        var row = data[0];
+        if (row && row.content_json && Array.isArray(row.content_json.live)) return row.content_json.live;
+        if (row && Array.isArray(row.live)) return row.live;
+      }
+      return [];
+    }
+
+    function escapeHtml(s) {
+      if (!s) return "";
+      var div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function savePlaylist(e) {
+      e.preventDefault();
+      if (!ensureAuth()) return;
+      var playlistName = document.getElementById("playlistName").value.trim();
+      var url = document.getElementById("m3uUrl").value.trim();
+      if (!playlistName) {
+        showToast("Playlist adı girin.", "error");
+        return;
+      }
+      if (!url) {
+        showToast("M3U URL girin.", "error");
+        return;
+      }
+      var btn = document.getElementById("saveBtn");
+      var creds = getCredentials();
+      btn.disabled = true;
+      btn.textContent = "İşleniyor…";
+
+      var payload = {
+        deviceId: creds.deviceId,
+        deviceKey: creds.deviceKey,
+        playlistName: playlistName,
+        m3uUrl: url
+      };
+
+      backendPost("save-playlist-url", payload)
+        .then(function(res) {
+          return res.text().then(function(t) {
+            var msg = "Kayıt sırasında hata oluştu";
+            try {
+              var j = JSON.parse(t);
+              if (j && j.error) msg = j.error;
+            } catch (e) {}
+            if (!res.ok) throw new Error(msg);
+            return t ? JSON.parse(t) : {};
+          });
+        })
+        .then(function() {
+          showToast("Playlist linki kaydedildi.");
+          document.getElementById("playlistName").value = "";
+          document.getElementById("m3uUrl").value = "";
+          loadPlaylist(true);
+        })
+        .catch(function(err) {
+          showToast(err.message || "Kayıt başarısız.", "error");
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = "Kaydet";
+        });
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadPlaylist);
+    document.getElementById("logoutBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      try {
+        sessionStorage.removeItem("veyron_device_id");
+        sessionStorage.removeItem("veyron_device_key");
+      } catch (err) {}
+      window.location.href = "index.html";
+    });
+
+    if (ensureAuth()) loadPlaylist();
+  </script>
+
+</body>
+</html>
