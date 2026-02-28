@@ -1,0 +1,244 @@
+# ============================================================
+# SMART TV IPTV PROJECT — STRICT CURSOR RULES
+# ============================================================
+# GOAL:
+# - Maximum readability
+# - Maximum maintainability
+# - Zero fragile architecture
+# - No hidden side effects
+# - Safe refactoring
+# ============================================================
+
+
+# ============================================================
+# 1. GENERAL PRINCIPLES
+# ============================================================
+
+- Never prioritize speed over architecture integrity.
+- Never introduce quick hacks.
+- Never modify unrelated files.
+- Never silently refactor large parts of the codebase.
+- Every change must be minimal and isolated.
+- If uncertain, leave a TODO instead of guessing.
+
+Project must remain:
+- Predictable
+- Modular
+- Refactor-safe
+- Easy to debug
+
+
+# ============================================================
+# 2. FILE SIZE & STRUCTURE RULES
+# ============================================================
+
+- Max 200 lines per file.
+- Max 30 lines per function.
+- One responsibility per file.
+- No multi-purpose utility dumping.
+- No god files.
+- No giant components.
+
+If a file grows too large:
+→ Split logically.
+→ Never stack responsibilities.
+
+
+# ============================================================
+# 3. FOLDER ARCHITECTURE (STRICT LAYERING)
+# ============================================================
+
+src/
+  app/
+    core/
+      network/
+      player/
+      activation/
+      storage/
+    domain/
+      models/
+      repositories/
+    features/
+      live/
+      movies/
+      series/
+      search/
+      favorites/
+    shared/
+      components/
+      hooks/
+      focus/
+      utils/
+
+RULES:
+
+- Features MUST NOT access network directly.
+- Features MUST NOT access storage directly.
+- Features MUST NOT manipulate player directly.
+- Only core layer handles infrastructure.
+- Domain layer contains only pure models and interfaces.
+- No cross-feature imports.
+- No circular dependencies.
+
+
+# ============================================================
+# 4. DEPENDENCY RULES
+# ============================================================
+
+Allowed direction:
+
+features → domain → core
+
+Never:
+
+core → features
+domain → features
+features → features
+
+Domain must remain pure.
+Core must remain infrastructure-only.
+Features must contain UI + orchestration only.
+
+
+# ============================================================
+# 5. PLAYER ISOLATION
+# ============================================================
+
+- UI must NEVER access HTMLVideoElement directly.
+- UI must NEVER call HLS.js directly.
+- All playback must go through PlayerEngine interface.
+- PlayerFactory is the only place where player implementation is selected.
+- Player must be replaceable without touching UI.
+
+
+# ============================================================
+# 6. NETWORK RULES
+# ============================================================
+
+- No direct fetch() inside components.
+- No hardcoded URLs.
+- No inline API calls.
+- All network calls go through repository implementation.
+- Repositories must implement domain interfaces.
+- No business logic inside network layer.
+
+
+# ============================================================
+# 7. LICENSE & ACTIVATION RULES
+# ============================================================
+
+- License state is server-authoritative.
+- No license logic inside UI.
+- No local expiration calculations.
+- No trial logic inside components.
+- Activation logic lives only in core/activation.
+
+
+# ============================================================
+# 8. STATE MANAGEMENT RULES
+# ============================================================
+
+- No implicit global state.
+- No hidden mutable objects.
+- No direct mutation of state.
+- Keep state minimal.
+- Derived values must be computed, not stored.
+- Avoid unnecessary re-renders.
+
+
+# ============================================================
+# 9. TV UX RULES
+# ============================================================
+
+- No hover assumptions.
+- No mouse-only interactions.
+- All focusable elements must support D-pad.
+- No tiny click areas.
+- No dynamic layout shifts during focus.
+- Focus logic must live inside shared/focus.
+
+
+# ============================================================
+# 10. MAGIC NUMBERS & HARDCODING
+# ============================================================
+
+- No magic numbers.
+- No inline constants.
+- All constants must be declared in a dedicated constants file.
+- No hidden configuration values.
+- No environment-dependent logic without abstraction.
+
+
+# ============================================================
+# 11. ERROR HANDLING
+# ============================================================
+
+- Never swallow errors.
+- Never use empty catch blocks.
+- Always log meaningful debug information.
+- Never expose internal errors to UI directly.
+- Return typed error responses.
+
+
+# ============================================================
+# 12. REFACTOR SAFETY
+# ============================================================
+
+When updating code:
+
+- Never rewrite entire files.
+- Never rename widely used interfaces without need.
+- Never change return types casually.
+- Never change model shape without updating contract layer.
+- Preserve backward compatibility when possible.
+
+
+# ============================================================
+# 13. MOCKING & TEST SAFETY
+# ============================================================
+
+- Mocks must live in dedicated mock folder.
+- No mock logic inside production files.
+- Remove temporary debug code before finishing task.
+- TODO comments must clearly describe future integration.
+
+
+# ============================================================
+# 14. PERFORMANCE RULES
+# ============================================================
+
+- No unnecessary re-renders.
+- No large in-memory data duplication.
+- Lazy load large datasets.
+- Memoize heavy computations.
+- Avoid blocking main thread.
+
+
+# ============================================================
+# 15. WHAT MUST NEVER HAPPEN
+# ============================================================
+
+- No architectural shortcuts.
+- No mixing layers.
+- No direct DOM manipulation in feature layer.
+- No business logic inside UI components.
+- No dependency chaos.
+- No “temporary” hacks left behind.
+
+
+# ============================================================
+# 16. CHANGE POLICY
+# ============================================================
+
+Before writing code:
+
+1. Understand existing structure.
+2. Respect current boundaries.
+3. Modify the minimum required surface.
+4. Keep system predictable.
+5. Leave project cleaner than before.
+
+
+# ============================================================
+# END OF RULES
+# ============================================================

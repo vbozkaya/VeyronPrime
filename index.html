@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="IPTV Player for Tizen TV"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:; connect-src *; img-src * data: blob:; style-src * 'unsafe-inline'; style-src-attr 'unsafe-inline'; media-src *;"/>
+
+    <title>IPTV Player</title>
+
+    <!-- HLS.js Library - Yerel dosya (player_manager.js'den önce yüklenmeli) -->
+    <script src="js/lib/hls.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <!-- Modüller - sıralama önemli (constants, state, storage, config) -->
+    <script src="js/core/constants.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/backend_config.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/core/device_identity.js"></script>
+    <script src="js/core/config.js"></script>
+    <script src="js/core/config_credentials.js"></script>
+    <script src="js/core/nav_spatial.js"></script>
+    <script src="js/core/nav_handlers_navigate.js"></script>
+    <script src="js/core/nav_handlers_main.js"></script>
+    <script src="js/core/nav_handlers.js"></script>
+    <script src="js/core/nav_manager.js"></script>
+    <!-- API Modülleri -->
+    <script src="js/api/api_utils.js"></script>
+    <script src="js/api/api_auth_response.js"></script>
+    <script src="js/api/api_auth.js"></script>
+    <script src="js/api/api_content.js"></script>
+    <script src="js/api/backend_api.js"></script>
+    <!-- Player Modülleri - API'lerden sonra, UI'dan önce (sıra önemli) -->
+    <script src="js/core/player_utils.js"></script>
+    <script src="js/core/player_errors.js"></script>
+    <script src="js/core/player_avplay_playback.js"></script>
+    <script src="js/core/player_avplay.js"></script>
+    <script src="js/core/player_hls_attach.js"></script>
+    <script src="js/core/player_hls.js"></script>
+    <script src="js/core/player_manager.js"></script>
+    <!-- UI Modülleri -->
+    <script src="js/ui/ui_manager.js"></script>
+    <script src="js/ui/ui_renderer.js"></script>
+    <script src="js/ui/ui_content.js"></script>
+    <!-- Ana uygulama: modaller ve işleyiciler önce, sonra başlatıcı -->
+    <script src="js/app_modals.js"></script>
+    <script src="js/app_handlers.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <!-- Landing Screen (Device Info) -->
+    <div id="landingScreen" class="screen active">
+        <div class="landing-container">
+            <div class="landing-logo-wrap">
+                <img src="assets/images/Veyron-Prime-Player.png" alt="Veyron Prime Player" class="landing-logo js-logo-hide-on-error"/>
+            </div>
+            <div class="landing-message-row">
+                <p class="landing-message">Aktivasyon ve playlist yüklemesi için<br>www.veyronprimeplayer.com<br>adresine gidin</p>
+                <img src="assets/images/veyron-1024.jpeg" alt="QR Kod" class="landing-qr"/>
+            </div>
+            <div class="landing-box">
+                <div class="device-info">
+                    <div class="info-item">
+                        <label>Device ID:</label>
+                        <div class="info-value" id="deviceId">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Device Key:</label>
+                        <div class="info-value" id="deviceKey">-</div>
+                    </div>
+                </div>
+                <div id="landingError" class="error-message"></div>
+                <div class="form-group">
+                    <button type="button" id="landingUpdateBtn" class="btn btn-primary btn-manual-setup" tabindex="0">Güncelle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Setup Screen (Login) -->
+    <div id="manualSetupScreen" class="screen">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="logo-container-small">
+                    <img src="assets/images/Veyron-Prime-Player.png" alt="Veyron Prime Player" class="small-logo js-logo-hide-on-error"/>
+                </div>
+                <h1 class="app-title">Manuel Kurulum</h1>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="serverUrl">DNS</label>
+                        <input type="text" id="serverUrl" name="serverUrl" placeholder="http://your-server.com" required autofocus/>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Kullanıcı Adı</label>
+                        <input type="text" id="username" name="username" placeholder="Kullanıcı adını girin" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Şifre</label>
+                        <input type="text" id="password" name="password" placeholder="Şifrenizi girin" required/>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="loginBtn" class="btn btn-primary">Giriş Yap</button>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" id="testConnectionBtn" class="btn btn-secondary btn-test-connection">Bağlantıyı Test Et</button>
+                    </div>
+                    <div id="loginError" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Home Menu Screen -->
+    <div id="homeMenuScreen" class="screen">
+        <div class="home-menu-container">
+            <div class="home-menu-header">
+                <h1 class="home-menu-title">Veyron Prime Player</h1>
+                <div class="home-menu-buttons">
+                    <button id="userInfoBtn" class="btn btn-header" tabindex="0" title="Kullanıcı Bilgileri">
+                        <span class="btn-icon">👤</span>
+                        <span class="btn-text">Kullanıcı</span>
+                    </button>
+                    <button id="deviceInfoBtn" class="btn btn-header" tabindex="0" title="Cihaz Bilgileri">
+                        <span class="btn-icon">📱</span>
+                        <span class="btn-text">Cihaz</span>
+                    </button>
+                    <button id="updateBtn" class="btn btn-update" tabindex="0" title="Verileri Güncelle">
+                        <span class="update-icon">🔄</span>
+                        <span class="update-text">Güncelle</span>
+                    </button>
+                    <button id="logoutFromHomeBtn" class="btn btn-header btn-logout" tabindex="0" title="Hesaptan Çıkış">
+                        <span class="btn-icon">🚪</span>
+                        <span class="btn-text">Hesaptan Çıkış</span>
+                    </button>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" id="menuLive" data-menu="live" tabindex="0">
+                    <div class="menu-icon">📺</div>
+                    <div class="menu-label">Canlı</div>
+                </div>
+                <div class="menu-item" id="menuMovies" data-menu="movies" tabindex="0">
+                    <div class="menu-icon">🎬</div>
+                    <div class="menu-label">Film</div>
+                </div>
+                <div class="menu-item" id="menuSeries" data-menu="series" tabindex="0">
+                    <div class="menu-icon">📺</div>
+                    <div class="menu-label">Dizi</div>
+                </div>
+                <div class="menu-item" id="menuFavorites" data-menu="favorites" tabindex="0">
+                    <div class="menu-icon">⭐</div>
+                    <div class="menu-label">Favori</div>
+                </div>
+            </div>
+        </div>
+        <!-- Bilgi modalı (Kullanıcı / Cihaz) -->
+        <div id="infoModal" class="info-modal" aria-hidden="true">
+            <div class="info-modal-backdrop"></div>
+            <div class="info-modal-panel">
+                <h2 class="info-modal-title" id="infoModalTitle">Bilgi</h2>
+                <div id="infoModalContent" class="info-modal-content"></div>
+                <button type="button" id="infoModalClose" class="btn btn-secondary" tabindex="0">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Screen -->
+    <div id="userManagementScreen" class="screen">
+        <div class="user-management-container">
+            <header class="user-management-header">
+                <h1 class="user-management-title">Kullanıcı Yönetimi</h1>
+                <button id="userManagementBackBtn" class="btn btn-secondary" tabindex="0">Geri</button>
+            </header>
+            <div class="user-list-container">
+                <div id="userList" class="user-list">
+                    <!-- Kullanıcılar buraya yüklenecek -->
+                </div>
+                <div id="noUsersMessage" class="no-users-message is-hidden">
+                    <p>Kayıtlı kullanıcı bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Screen -->
+    <div id="mainScreen" class="screen">
+        <header class="main-header">
+            <h1 id="mainScreenTitle">IPTV Channels</h1>
+            <button id="backToHomeBtn" class="btn btn-secondary" tabindex="0">Ana Menü</button>
+        </header>
+        
+        <div class="content-wrapper">
+            <nav class="sidebar">
+                <div class="category-list" id="categoryList">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </nav>
+            
+            <main class="main-content">
+                <div class="channel-grid" id="channelGrid">
+                    <!-- Channels will be loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Player Screen -->
+    <div id="playerScreen" class="screen">
+        <div class="player-container">
+            <video id="videoPlayer" class="video-player" controls autoplay muted playsinline></video>
+            <div class="player-controls">
+                <button id="backBtn" class="btn btn-secondary">Back to Channels</button>
+                <div class="channel-info" id="channelInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Loading...</p>
+    </div>
+
+    <!-- Onay modalı (confirm/alert yerine) -->
+    <div id="confirmModal" class="confirm-modal" aria-hidden="true">
+        <div class="confirm-modal-backdrop"></div>
+        <div class="confirm-modal-panel">
+            <h2 class="confirm-modal-title" id="confirmModalTitle">Onay</h2>
+            <p class="confirm-modal-message" id="confirmModalMessage"></p>
+            <div class="confirm-modal-actions">
+                <button type="button" id="confirmModalCancel" class="btn btn-secondary" tabindex="0">İptal</button>
+                <button type="button" id="confirmModalOk" class="btn btn-primary" tabindex="0">Tamam</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

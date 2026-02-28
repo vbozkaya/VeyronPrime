@@ -1,0 +1,1150 @@
+/**
+ * Veyron Prime Player - Modern Dark Theme
+ * Renk Paleti: Derin Siyah (#000000), Koyu Lacivert (#050A30), Altın Vurgular (#D4AF37)
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #000000 0%, #050A30 100%);
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    min-height: 100vh;
+    min-width: 100vw;
+    position: relative;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    visibility: visible;
+}
+
+/* Logo Styles - TV Optimized (1920x1080) */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+    width: 100%;
+    min-height: 450px;
+    position: relative;
+}
+
+.main-logo {
+    width: 800px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Landing: Logo doğrudan altında yazı, ekrana sığacak şekilde kompakt */
+.landing-logo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+    min-height: 0;
+}
+
+.landing-logo {
+    width: 480px;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.logo-container-small {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+    min-height: 220px;
+    position: relative;
+}
+
+.small-logo {
+    width: 400px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
+/* Landing Screen */
+#landingScreen {
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #000000 0%, #050A30 50%, #000000 100%);
+}
+
+.landing-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 24px 40px;
+}
+
+.landing-box {
+    background: rgba(5, 10, 48, 0.95);
+    border-radius: 20px;
+    padding: 24px 40px 28px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.device-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+#landingScreen .device-info {
+    gap: 14px;
+    margin-bottom: 18px;
+    margin-top: 0;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item label {
+    font-size: 18px;
+    color: #D4AF37;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-value {
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 20px;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+    transition: all 0.3s ease;
+}
+
+.info-value:focus {
+    border-color: #D4AF37;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.landing-message-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    margin: 12px 0 20px 0;
+}
+
+.landing-message {
+    text-align: center;
+    margin: 0;
+    font-size: 24px;
+    color: #f4e4a6;
+    line-height: 1.5;
+}
+
+.landing-qr {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Manual Setup Screen (Login) */
+#manualSetupScreen {
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #000000 0%, #050A30 50%, #000000 100%);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+}
+
+.login-box {
+    background: rgba(5, 10, 48, 0.95);
+    border-radius: 20px;
+    padding: 40px 40px 50px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.app-title {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+#landingScreen .app-title {
+    display: none;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group label {
+    font-size: 18px;
+    color: #D4AF37;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-group input {
+    padding: 15px 20px;
+    font-size: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 10px;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #D4AF37;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Buttons */
+.btn {
+    padding: 15px 30px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    outline: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%);
+    color: #000000;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    font-weight: 700;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(212, 175, 55, 0.7);
+    background: linear-gradient(135deg, #E5C158 0%, #D4AF37 100%);
+    outline: 3px solid rgba(212, 175, 55, 0.5);
+    outline-offset: 2px;
+}
+
+.btn-manual-setup {
+    width: 100%;
+    padding: 20px 30px;
+    font-size: 24px;
+    margin-top: 20px;
+    min-height: 70px;
+    box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5) !important;
+}
+
+.btn-secondary {
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #D4AF37;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+/* Error Message */
+.error-message {
+    display: none;
+    padding: 15px;
+    background: rgba(220, 53, 69, 0.2);
+    border: 1px solid rgba(220, 53, 69, 0.5);
+    border-radius: 8px;
+    color: #ff6b6b;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Home Menu Screen */
+#homeMenuScreen {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #000000 0%, #050A30 50%, #000000 100%);
+}
+
+.home-menu-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px;
+    padding-top: 100px;
+    text-align: center;
+}
+
+/* Üst çubuk: başlık sol, butonlar sağ üst köşede */
+.home-menu-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    gap: 24px;
+    box-sizing: border-box;
+}
+
+.home-menu-title {
+    font-size: 56px;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.home-menu-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 1400px) {
+    .home-menu-title {
+        font-size: 42px;
+    }
+    .home-menu-buttons button {
+        min-width: 100px;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+/* Ana sayfa üst butonları aynı boyutta (Kullanıcı, Cihaz, Güncelle, Hesaptan Çıkış) */
+.home-menu-buttons button {
+    min-width: 140px;
+    padding: 14px 24px;
+    font-size: 16px;
+    min-height: 48px;
+    box-sizing: border-box;
+}
+
+.btn-header {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(184, 148, 31, 0.2) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: #D4AF37;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 140px;
+    min-height: 48px;
+}
+
+.btn-header:hover,
+.btn-header:focus {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.4) 0%, rgba(184, 148, 31, 0.4) 100%);
+    border-color: #D4AF37;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.btn-header .btn-icon {
+    font-size: 18px;
+}
+
+.btn-header .btn-text {
+    display: inline-block;
+}
+
+.btn-update {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(184, 148, 31, 0.2) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: #D4AF37;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+    min-height: 48px;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-update:hover,
+.btn-update:focus {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.4) 0%, rgba(184, 148, 31, 0.4) 100%);
+    border-color: #D4AF37;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.btn-update:active {
+    transform: translateY(0);
+}
+
+.btn-update.updating {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-update.updating .update-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.update-icon {
+    font-size: 20px;
+    display: inline-block;
+}
+
+.update-text {
+    display: inline-block;
+}
+
+/* Bilgi modalı (Kullanıcı / Cihaz) */
+.info-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.info-modal[aria-hidden="false"] {
+    display: flex;
+}
+
+.info-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.info-modal-panel {
+    position: relative;
+    z-index: 1;
+    background: rgba(5, 10, 48, 0.98);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 20px;
+    padding: 32px 40px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.info-modal-title {
+    font-size: 24px;
+    color: #D4AF37;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.info-modal-content .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-modal-content .info-row label {
+    font-size: 14px;
+    color: rgba(212, 175, 55, 0.9);
+    font-weight: 600;
+}
+
+.info-modal-content .info-row span {
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 15px;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+.info-modal-panel .btn-secondary {
+    width: 100%;
+}
+
+/* Onay modalı (confirm/alert yerine) */
+.confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.confirm-modal[aria-hidden="false"] {
+    display: flex;
+}
+
+.confirm-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.confirm-modal-panel {
+    position: relative;
+    z-index: 1;
+    background: rgba(5, 10, 48, 0.98);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 20px;
+    padding: 32px 40px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.confirm-modal-title {
+    font-size: 22px;
+    color: #D4AF37;
+    margin: 0 0 16px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.confirm-modal-message {
+    font-size: 16px;
+    color: #e0e0e0;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.confirm-modal-actions .btn {
+    min-width: 100px;
+}
+
+/* Logo hata durumunda gizle (inline script yerine) */
+.js-logo-hide-on-error.error-loaded {
+    display: none;
+}
+
+/* Bağlantı test butonu boşluk */
+.btn-test-connection {
+    margin-top: 10px;
+}
+
+/* Kullanıcı listesi görünürlük (inline style yerine) */
+.no-users-message.is-hidden {
+    display: none;
+}
+
+.user-list.is-hidden {
+    display: none;
+}
+
+.user-item-info .user-item-label + .user-item-label {
+    margin-top: 8px;
+}
+
+/* Kullanıcı Yönetimi Ekranı */
+#userManagementScreen {
+    justify-content: flex-start;
+    align-items: center;
+    background: linear-gradient(135deg, #000000 0%, #050A30 50%, #000000 100%);
+    padding: 40px;
+}
+
+.user-management-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.user-management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    gap: 20px;
+}
+
+.user-management-title {
+    font-size: 48px;
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.user-list-container {
+    background: rgba(5, 10, 48, 0.6);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    min-height: 400px;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.user-item {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.user-item:hover,
+.user-item:focus-within {
+    border-color: rgba(212, 175, 55, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
+}
+
+.user-item.active {
+    border-color: #D4AF37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.user-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-item-label {
+    font-size: 14px;
+    color: rgba(212, 175, 55, 0.8);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-item-value {
+    font-size: 18px;
+    color: #e0e0e0;
+    word-break: break-all;
+}
+
+.user-item-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.user-item-active-badge {
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #D4AF37;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.btn-delete-user {
+    background: rgba(220, 53, 69, 0.2);
+    border: 2px solid rgba(220, 53, 69, 0.5);
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: #dc3545;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-delete-user:hover,
+.btn-delete-user:focus {
+    background: rgba(220, 53, 69, 0.4);
+    border-color: #dc3545;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(220, 53, 69, 0.3);
+    outline: 3px solid rgba(220, 53, 69, 0.3);
+    outline-offset: 2px;
+}
+
+.no-users-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(224, 224, 224, 0.6);
+    font-size: 18px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.menu-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 40px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-height: 250px;
+    justify-content: center;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(212, 175, 55, 0.6);
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+    outline: 3px solid rgba(212, 175, 55, 0.4);
+    outline-offset: 3px;
+}
+
+.menu-item.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(184, 148, 31, 0.3) 100%);
+    border-color: #D4AF37;
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+}
+
+.menu-icon {
+    font-size: 80px;
+    line-height: 1;
+}
+
+.menu-label {
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Main Screen */
+#mainScreen {
+    flex-direction: column;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.main-header h1 {
+    font-size: 36px;
+    font-weight: 300;
+    color: #ffffff;
+}
+
+.content-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 300px;
+    background: rgba(0, 0, 0, 0.5);
+    border-right: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.category-item {
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #b0b0b0;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover,
+.category-item:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(212, 175, 55, 0.6);
+    color: #ffffff;
+    transform: translateX(5px);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.category-item.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(184, 148, 31, 0.2) 100%);
+    color: #D4AF37;
+    border-color: #D4AF37;
+    font-weight: 600;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.channel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.channel-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(212, 175, 55, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    min-height: 200px;
+    justify-content: center;
+}
+
+.channel-card:hover,
+.channel-card:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #D4AF37;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+    outline: 3px solid rgba(212, 175, 55, 0.3);
+    outline-offset: 2px;
+}
+
+.channel-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.logo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(184, 148, 31, 0.3) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: #D4AF37;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    box-sizing: border-box;
+}
+
+.channel-name {
+    font-size: 16px;
+    color: #e0e0e0;
+    text-align: center;
+    font-weight: 500;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Player Screen */
+#playerScreen {
+    justify-content: center;
+    align-items: center;
+    background: transparent !important; /* AVPlay video katmanının görünmesi için şeffaf */
+    z-index: 9999 !important; /* AVPlay video katmanının en üstte olması için */
+}
+
+.player-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10000; /* Container'ın da en üstte olması için */
+    background: transparent !important; /* AVPlay video katmanının görünmesi için şeffaf */
+}
+
+.video-player {
+    width: 100%;
+    height: calc(100% - 80px);
+    background: #000000;
+    z-index: 10002 !important; /* HLS.js video elementinin en üstte olması için */
+    position: relative;
+}
+
+.player-controls {
+    height: 80px;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    position: relative;
+    z-index: 10001; /* AVPlay video üzerinde görünmesi için */
+    margin-top: auto; /* Container'ın altına yapıştır */
+}
+
+.channel-info {
+    font-size: 24px;
+    color: #ffffff;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.channel-info.buffering {
+    color: #D4AF37;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.channel-info.error {
+    color: #ff4444;
+    font-weight: 600;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(212, 175, 55, 0.2);
+    border-top-color: #D4AF37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    margin-top: 20px;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.5);
+}
+
+/* Focus Styles for TV Navigation - Altın Sarısı (#D4AF37) Standard */
+*:focus {
+    outline: 3px solid #D4AF37;
+    outline-offset: 2px;
+}
+
+button:focus,
+input:focus,
+.menu-item:focus,
+.category-item:focus,
+.channel-card:focus {
+    outline: 3px solid #D4AF37;
+    outline-offset: 3px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1920px) {
+    .channel-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
