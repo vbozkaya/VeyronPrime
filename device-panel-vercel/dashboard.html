@@ -471,7 +471,7 @@
       var body = { deviceId: creds.deviceId, device_id: creds.deviceId };
       if (noCache) body._t = Date.now();
       var getOpts = noCache ? { cache: "no-store" } : undefined;
-      backendPost("get-content", body, getOpts)
+      backendPost("get-playlist", body, getOpts)
         .then(function(res) {
           if (!res.ok) throw new Error("İçerik alınamadı");
           return res.json();
@@ -485,8 +485,11 @@
             countEl.textContent = "1 playlist";
           } else {
             emptyEl.style.display = "block";
-            if (emptyMsgEl) emptyMsgEl.textContent = "Henüz playlist yok.";
-            if (emptyHintEl) emptyHintEl.style.display = "block";
+            if (emptyMsgEl) emptyMsgEl.textContent = "Bu cihaz için kayıtlı playlist yok.";
+            if (emptyHintEl) {
+              emptyHintEl.style.display = "block";
+              emptyHintEl.textContent = "Giriş yaptığınız Device ID: " + (creds.deviceId || "—") + ". Playlist eklemek için yukarıdaki formu doldurup Kaydet'e basın. TV uygulamasındaki Device ID ile aynı olmalı.";
+            }
             countEl.textContent = "—";
           }
         })

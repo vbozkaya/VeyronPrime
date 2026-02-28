@@ -63,7 +63,16 @@ module.exports = async function handler(req, res) {
 
     if (fromPanel) {
       if (!existing) {
-        json(res, 403, { error: 'Geçersiz cihaz bilgisi' });
+        // Panelden ilk giriş: cihaz yoksa oluştur, böylece playlist kaydedilebilsin
+        const trialEndsAt = new Date();
+        trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS);
+        await db.execute({
+          sql: `INSERT INTO devices (device_id, device_key, trial_ends_at, updated_at)
+                VALUES (?, ?, ?, datetime('now'))
+                ON CONFLICT(device_id) DO NOTHING`,
+          args: [deviceId, deviceKey, trialEndsAt.toISOString()],
+        });
+        json(res, 200, { status: 'created' });
         return;
       }
       if (existing.device_key !== deviceKey) {
