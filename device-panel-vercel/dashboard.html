@@ -239,6 +239,23 @@
       font-size: 0.8125rem;
       color: var(--text-muted);
     }
+    .saved-playlist-info {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .saved-playlist-info .info-row {
+      margin-bottom: 6px;
+      font-size: 0.875rem;
+    }
+    .saved-playlist-info .info-row:last-child { margin-bottom: 0; }
+    .saved-playlist-info .url-link {
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .saved-playlist-info .url-link:hover { text-decoration: underline; }
 
     .channel-list {
       list-style: none;
@@ -379,11 +396,15 @@
       </div>
       <p class="card-subtitle" style="margin-top: -8px; margin-bottom: 16px;">Cihazınıza kayıtlı kanallar.</p>
       <div id="playlistContent">
+        <div class="saved-playlist-info" id="savedPlaylistInfo" style="display: none;">
+          <div class="info-row"><strong>Playlist adı:</strong> <span id="savedPlaylistName">—</span></div>
+          <div class="info-row"><strong>M3U URL:</strong> <a id="savedPlaylistUrl" href="#" target="_blank" rel="noopener" class="url-link">—</a></div>
+        </div>
         <div class="loading-state" id="loadingState">Yükleniyor…</div>
         <ul class="channel-list" id="channelList" style="display: none;"></ul>
         <div class="empty-state" id="emptyState" style="display: none;">
-          <p>Henüz kanal yok.</p>
-          <p style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra birkaç saniye bekleyip "Yenile"ye basın.</p>
+          <p id="emptyStateMessage">Henüz kanal yok.</p>
+          <p id="emptyStateHint" style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra birkaç saniye bekleyip "Yenile"ye basın.</p>
         </div>
       </div>
     </div>
@@ -467,10 +488,16 @@
       var listEl = document.getElementById("channelList");
       var emptyEl = document.getElementById("emptyState");
       var countEl = document.getElementById("playlistCount");
+      var savedInfoEl = document.getElementById("savedPlaylistInfo");
+      var savedNameEl = document.getElementById("savedPlaylistName");
+      var savedUrlEl = document.getElementById("savedPlaylistUrl");
+      var emptyMsgEl = document.getElementById("emptyStateMessage");
+      var emptyHintEl = document.getElementById("emptyStateHint");
 
       loadingEl.style.display = "block";
       listEl.style.display = "none";
       emptyEl.style.display = "none";
+      if (savedInfoEl) savedInfoEl.style.display = "none";
 
       var body = { deviceId: creds.deviceId, device_id: creds.deviceId };
       if (noCache) body._t = Date.now();
@@ -481,26 +508,43 @@
           return res.json();
         })
         .then(function(data) {
+          var hasSavedPlaylist = !!(data.m3u_url && savedInfoEl && savedNameEl && savedUrlEl);
+          if (hasSavedPlaylist) {
+            savedInfoEl.style.display = "block";
+            savedNameEl.textContent = (data.playlist_name && data.playlist_name.trim()) ? data.playlist_name.trim() : "—";
+            savedUrlEl.href = data.m3u_url;
+            savedUrlEl.textContent = data.m3u_url;
+          }
           var live = extractLive(data);
           if ((!live || live.length === 0) && data.m3u_url) {
             return fetch(data.m3u_url, { method: "GET", redirect: "follow", credentials: "omit" })
               .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error("M3U indirilemedi")); })
               .then(function(m3uText) {
-                return parseM3uText(m3uText).map(function(item) {
+                return { live: parseM3uText(m3uText).map(function(item) {
                   return { name: item.name, url: item.url, group: item.group || "Genel" };
-                });
+                }), hasSavedPlaylist: hasSavedPlaylist };
               })
-              .catch(function() { return []; });
+              .catch(function() { return { live: [], hasSavedPlaylist: hasSavedPlaylist }; });
           }
-          return Promise.resolve(live);
+          return Promise.resolve({ live: live, hasSavedPlaylist: hasSavedPlaylist });
         })
-        .then(function(live) {
+        .then(function(result) {
+          var live = Array.isArray(result.live) ? result.live : result;
+          var hasSavedPlaylist = result.hasSavedPlaylist === true;
+          if (!Array.isArray(live)) live = [];
           loadingEl.style.display = "none";
-          if (!Array.isArray(live) || live.length === 0) {
+          if (live.length === 0) {
             emptyEl.style.display = "block";
             countEl.textContent = "0 kanal";
+            if (emptyMsgEl) {
+              emptyMsgEl.textContent = hasSavedPlaylist
+                ? "Kanal listesi tarayıcıdan yüklenemedi (CORS). Cihazda Güncelle ile içerik yüklenecektir."
+                : "Henüz kanal yok.";
+            }
+            if (emptyHintEl) emptyHintEl.style.display = hasSavedPlaylist ? "none" : "block";
             return;
           }
+          if (emptyHintEl) emptyHintEl.style.display = "block";
           var byGroup = {};
           live.forEach(function(item) {
             var g = (item.group || item.category_name || "").trim() || "Genel";
@@ -528,7 +572,8 @@
         .catch(function(err) {
           loadingEl.style.display = "none";
           emptyEl.style.display = "block";
-          document.querySelector("#emptyState p").textContent = err.message || "Liste yüklenemedi.";
+          if (emptyMsgEl) emptyMsgEl.textContent = err.message || "Liste yüklenemedi.";
+          if (emptyHintEl) emptyHintEl.style.display = "block";
           countEl.textContent = "—";
         });
     }
