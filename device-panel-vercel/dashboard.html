@@ -351,28 +351,81 @@
 
     .toast.success { background: var(--success); color: var(--bg); }
     .toast.error { background: var(--error); color: #fff; }
+
+    .header-breadcrumb {
+      color: var(--border);
+      margin: 0 4px;
+    }
+    .header-page-name {
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+    .header-badge {
+      font-size: 0.7rem;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .playlist-toolbar {
+      align-items: center;
+    }
+    .playlist-toolbar .card-title { margin: 0; }
+    .playlist-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-subtitle-tight {
+      margin-top: -8px;
+      margin-bottom: 16px;
+    }
+    .saved-playlist-info.hidden { display: none !important; }
+    .saved-playlist-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .saved-playlist-row strong { font-weight: 600; }
+    .btn-delete {
+      color: var(--error);
+      font-size: 0.875rem;
+    }
+    .btn-delete:hover { color: #ff7b73; border-color: var(--error); }
+    .empty-state.hidden { display: none !important; }
+    .empty-state-hint { font-size: 0.8125rem; }
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0 24px;
+    }
   </style>
 </head>
 <body>
-  <!-- DEPLOY-ID: veyron-panel-v2-2025 - Bu satırı görüyorsanız güncel deploy çalışıyor -->
+  <!-- DEPLOY-ID: veyron-panel-v2-2025 -->
 
   <header class="header">
     <div class="header-left">
       <a href="index.html" class="logo-link">
-        <img src="../assets/images/icon.jpg" alt="Veyron Prime" class="header-logo" />
+        <img src="../assets/images/icon.png" alt="Veyron Prime" class="header-logo" onerror="this.style.display='none'" />
         Veyron<span> Prime</span>
       </a>
-      <span style="color: var(--border);">/</span>
-      <span style="font-size: 0.9375rem; color: var(--text-muted);">Playlist</span>
-      <span style="font-size: 0.7rem; color: var(--accent); margin-left: 8px; padding: 2px 8px; background: var(--accent-dim); border-radius: 6px;">Panel v2</span>
+      <span class="header-breadcrumb">/</span>
+      <span class="header-page-name">Playlist</span>
+      <span class="header-badge">Panel v2</span>
     </div>
     <a href="index.html" class="logout" id="logoutBtn">Çıkış</a>
   </header>
 
   <main class="main">
-    <div class="card">
-      <h3 class="card-title">Playlist ekle veya güncelle</h3>
-      <p class="card-subtitle">Sadece M3U linki kaydedilir. İçerik cihazda "Güncelle" ile indirilip listelenir.</p>
+    <section class="card" aria-labelledby="card-add-title">
+      <h2 id="card-add-title" class="card-title">Playlist ekle veya güncelle</h2>
+      <p class="card-subtitle">Sadece M3U linki kaydedilir. İçerik cihazda &quot;Güncelle&quot; ile indirilip listelenir.</p>
+      <div class="section-divider" aria-hidden="true"></div>
       <form id="m3uForm" onsubmit="savePlaylist(event); return false;">
         <div class="form-group">
           <label for="playlistName">Playlist adı</label>
@@ -386,31 +439,32 @@
           <button type="submit" class="btn" id="saveBtn">Kaydet</button>
         </div>
       </form>
-    </div>
+    </section>
 
-    <div class="card">
+    <section class="card" aria-labelledby="card-current-title">
       <div class="playlist-toolbar">
-        <h3 class="card-title" style="margin: 0;">Mevcut playlist</h3>
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <h2 id="card-current-title" class="card-title">Mevcut playlist</h2>
+        <div class="playlist-toolbar-actions">
           <span class="playlist-count" id="playlistCount">—</span>
           <button type="button" class="btn btn-ghost" id="refreshBtn">Yenile</button>
         </div>
       </div>
-      <p class="card-subtitle" style="margin-top: -8px; margin-bottom: 16px;">Cihazınıza kayıtlı playlist.</p>
+      <p class="card-subtitle card-subtitle-tight">Cihazınıza kayıtlı playlist.</p>
+      <div class="section-divider" aria-hidden="true"></div>
       <div id="playlistContent">
-        <div class="saved-playlist-info" id="savedPlaylistInfo" style="display: none;">
-          <div class="info-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div class="saved-playlist-info hidden" id="savedPlaylistInfo">
+          <div class="saved-playlist-row">
             <span><strong>Playlist adı:</strong> <span id="savedPlaylistName">—</span></span>
-            <button type="button" class="btn btn-ghost" id="deletePlaylistBtn" style="color: var(--error); font-size: 0.875rem;">Playlisti sil</button>
+            <button type="button" class="btn btn-ghost btn-delete" id="deletePlaylistBtn">Playlisti sil</button>
           </div>
         </div>
         <div class="loading-state" id="loadingState">Yükleniyor…</div>
-        <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state hidden" id="emptyState">
           <p id="emptyStateMessage">Henüz playlist yok.</p>
-          <p id="emptyStateHint" style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra "Yenile"ye basın.</p>
+          <p id="emptyStateHint" class="empty-state-hint">Yukarıya playlist adı ve M3U URL'si girip &quot;Kaydet&quot; ile ekleyin. Kaydettikten sonra &quot;Yenile&quot;ye basın.</p>
         </div>
       </div>
-    </div>
+    </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -470,8 +524,8 @@
       var emptyHintEl = document.getElementById("emptyStateHint");
 
       loadingEl.style.display = "block";
-      emptyEl.style.display = "none";
-      if (savedInfoEl) savedInfoEl.style.display = "none";
+      emptyEl.classList.add("hidden");
+      if (savedInfoEl) savedInfoEl.classList.add("hidden");
 
       var body = { deviceId: creds.deviceId, device_id: creds.deviceId };
       if (noCache) body._t = Date.now();
@@ -485,14 +539,13 @@
           loadingEl.style.display = "none";
           var hasPlaylist = !!(data.m3u_url && savedInfoEl && savedNameEl);
           if (hasPlaylist) {
-            savedInfoEl.style.display = "block";
+            savedInfoEl.classList.remove("hidden");
             savedNameEl.textContent = (data.playlist_name && String(data.playlist_name).trim()) ? String(data.playlist_name).trim() : "—";
             countEl.textContent = "1 playlist";
           } else {
-            emptyEl.style.display = "block";
+            emptyEl.classList.remove("hidden");
             if (emptyMsgEl) emptyMsgEl.textContent = "Bu cihaz için kayıtlı playlist yok.";
             if (emptyHintEl) {
-              emptyHintEl.style.display = "block";
               emptyHintEl.textContent = "Giriş yaptığınız Device ID: " + (creds.deviceId || "—") + ". Playlist eklemek için yukarıdaki formu doldurup Kaydet'e basın. TV uygulamasındaki Device ID ile aynı olmalı.";
             }
             countEl.textContent = "—";
@@ -500,9 +553,9 @@
         })
         .catch(function(err) {
           loadingEl.style.display = "none";
-          emptyEl.style.display = "block";
+          emptyEl.classList.remove("hidden");
           if (emptyMsgEl) emptyMsgEl.textContent = err.message || "Liste yüklenemedi.";
-          if (emptyHintEl) { emptyHintEl.style.display = "block"; emptyHintEl.textContent = "Panele giriş yaptığınız Device ID ile playlist kaydettiğinizden emin olun. Yenile'yi tekrar deneyin."; }
+          if (emptyHintEl) emptyHintEl.textContent = "Panele giriş yaptığınız Device ID ile playlist kaydettiğinizden emin olun. Yenile'yi tekrar deneyin.";
           countEl.textContent = "—";
         });
     }
