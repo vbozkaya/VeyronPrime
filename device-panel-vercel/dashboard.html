@@ -394,17 +394,15 @@
           <button type="button" class="btn btn-ghost" id="refreshBtn">Yenile</button>
         </div>
       </div>
-      <p class="card-subtitle" style="margin-top: -8px; margin-bottom: 16px;">Cihazınıza kayıtlı kanallar.</p>
+      <p class="card-subtitle" style="margin-top: -8px; margin-bottom: 16px;">Cihazınıza kayıtlı playlist.</p>
       <div id="playlistContent">
         <div class="saved-playlist-info" id="savedPlaylistInfo" style="display: none;">
           <div class="info-row"><strong>Playlist adı:</strong> <span id="savedPlaylistName">—</span></div>
-          <div class="info-row"><strong>M3U URL:</strong> <a id="savedPlaylistUrl" href="#" target="_blank" rel="noopener" class="url-link">—</a></div>
         </div>
         <div class="loading-state" id="loadingState">Yükleniyor…</div>
-        <ul class="channel-list" id="channelList" style="display: none;"></ul>
         <div class="empty-state" id="emptyState" style="display: none;">
-          <p id="emptyStateMessage">Henüz kanal yok.</p>
-          <p id="emptyStateHint" style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra birkaç saniye bekleyip "Yenile"ye basın.</p>
+          <p id="emptyStateMessage">Henüz playlist yok.</p>
+          <p id="emptyStateHint" style="font-size: 0.8125rem;">Yukarıya playlist adı ve M3U URL'si girip "Kaydet" ile ekleyin. Kaydettikten sonra "Yenile"ye basın.</p>
         </div>
       </div>
     </div>
@@ -455,47 +453,18 @@
       return fetch(API_BASE + "/" + path, opts);
     }
 
-    function parseM3uText(text) {
-      var live = [];
-      var lines = (text || "").split("\n").map(function(l) { return l.trim(); });
-      var currentName = "", currentLogo = "", currentGroup = "";
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-        if (line.indexOf("#EXTINF") === 0) {
-          var nameMatch = line.match(/,(.*)$/);
-          currentName = nameMatch ? nameMatch[1].trim() : "";
-          var logoMatch = line.match(/tvg-logo="(.*?)"/);
-          currentLogo = logoMatch ? logoMatch[1] : "";
-          var groupMatch = line.match(/group-title="(.*?)"/);
-          currentGroup = groupMatch ? groupMatch[1] : "";
-          continue;
-        }
-        if (line.indexOf("http") === 0) {
-          live.push({
-            name: currentName || "Kanal " + (live.length + 1),
-            url: line.trim(),
-            group: currentGroup || "Genel"
-          });
-        }
-      }
-      return live;
-    }
-
     function loadPlaylist(noCache) {
       if (!ensureAuth()) return;
       var creds = getCredentials();
       var loadingEl = document.getElementById("loadingState");
-      var listEl = document.getElementById("channelList");
       var emptyEl = document.getElementById("emptyState");
       var countEl = document.getElementById("playlistCount");
       var savedInfoEl = document.getElementById("savedPlaylistInfo");
       var savedNameEl = document.getElementById("savedPlaylistName");
-      var savedUrlEl = document.getElementById("savedPlaylistUrl");
       var emptyMsgEl = document.getElementById("emptyStateMessage");
       var emptyHintEl = document.getElementById("emptyStateHint");
 
       loadingEl.style.display = "block";
-      listEl.style.display = "none";
       emptyEl.style.display = "none";
       if (savedInfoEl) savedInfoEl.style.display = "none";
 
@@ -508,91 +477,26 @@
           return res.json();
         })
         .then(function(data) {
-          var hasSavedPlaylist = !!(data.m3u_url && savedInfoEl && savedNameEl && savedUrlEl);
-          if (hasSavedPlaylist) {
-            savedInfoEl.style.display = "block";
-            savedNameEl.textContent = (data.playlist_name && data.playlist_name.trim()) ? data.playlist_name.trim() : "—";
-            savedUrlEl.href = data.m3u_url;
-            savedUrlEl.textContent = data.m3u_url;
-          }
-          var live = extractLive(data);
-          if ((!live || live.length === 0) && data.m3u_url) {
-            return fetch(data.m3u_url, { method: "GET", redirect: "follow", credentials: "omit" })
-              .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error("M3U indirilemedi")); })
-              .then(function(m3uText) {
-                return { live: parseM3uText(m3uText).map(function(item) {
-                  return { name: item.name, url: item.url, group: item.group || "Genel" };
-                }), hasSavedPlaylist: hasSavedPlaylist };
-              })
-              .catch(function() { return { live: [], hasSavedPlaylist: hasSavedPlaylist }; });
-          }
-          return Promise.resolve({ live: live, hasSavedPlaylist: hasSavedPlaylist });
-        })
-        .then(function(result) {
-          var live = Array.isArray(result.live) ? result.live : result;
-          var hasSavedPlaylist = result.hasSavedPlaylist === true;
-          if (!Array.isArray(live)) live = [];
           loadingEl.style.display = "none";
-          if (live.length === 0) {
+          var hasPlaylist = !!(data.m3u_url && savedInfoEl && savedNameEl);
+          if (hasPlaylist) {
+            savedInfoEl.style.display = "block";
+            savedNameEl.textContent = (data.playlist_name && String(data.playlist_name).trim()) ? String(data.playlist_name).trim() : "—";
+            countEl.textContent = "1 playlist";
+          } else {
             emptyEl.style.display = "block";
-            countEl.textContent = "0 kanal";
-            if (emptyMsgEl) {
-              emptyMsgEl.textContent = hasSavedPlaylist
-                ? "Kanal listesi tarayıcıdan yüklenemedi (CORS). Cihazda Güncelle ile içerik yüklenecektir."
-                : "Henüz kanal yok.";
-            }
-            if (emptyHintEl) emptyHintEl.style.display = hasSavedPlaylist ? "none" : "block";
-            return;
+            if (emptyMsgEl) emptyMsgEl.textContent = "Henüz playlist yok.";
+            if (emptyHintEl) emptyHintEl.style.display = "block";
+            countEl.textContent = "—";
           }
-          if (emptyHintEl) emptyHintEl.style.display = "block";
-          var byGroup = {};
-          live.forEach(function(item) {
-            var g = (item.group || item.category_name || "").trim() || "Genel";
-            if (!byGroup[g]) byGroup[g] = [];
-            byGroup[g].push({
-              name: item.name || "Kanal",
-              url: item.url || item.stream_url || item.streamUrl || ""
-            });
-          });
-          var html = "";
-          Object.keys(byGroup).sort().forEach(function(group) {
-            html += '<li class="channel-group"><div class="channel-group-title">' + escapeHtml(group) + "</div>";
-            byGroup[group].forEach(function(ch) {
-              html += '<div class="channel-item">';
-              html += '<span class="channel-name">' + escapeHtml(ch.name) + "</span>";
-              html += '<span class="channel-url" title="' + escapeHtml(ch.url) + '">' + escapeHtml(ch.url) + "</span>";
-              html += "</div>";
-            });
-            html += "</li>";
-          });
-          listEl.innerHTML = html;
-          listEl.style.display = "block";
-          countEl.textContent = live.length + " kanal";
         })
         .catch(function(err) {
           loadingEl.style.display = "none";
           emptyEl.style.display = "block";
           if (emptyMsgEl) emptyMsgEl.textContent = err.message || "Liste yüklenemedi.";
-          if (emptyHintEl) emptyHintEl.style.display = "block";
+          if (emptyHintEl) { emptyHintEl.style.display = "block"; emptyHintEl.textContent = "Panele giriş yaptığınız Device ID ile playlist kaydettiğinizden emin olun. Yenile'yi tekrar deneyin."; }
           countEl.textContent = "—";
         });
-    }
-
-    function extractLive(data) {
-      if (!data) return [];
-      if (Array.isArray(data.live) && data.live.length > 0) return data.live;
-      if (data.content_json && Array.isArray(data.content_json.live)) return data.content_json.live;
-      if (data.data) {
-        var d = data.data;
-        if (Array.isArray(d.live)) return d.live;
-        if (d.content_json && Array.isArray(d.content_json.live)) return d.content_json.live;
-      }
-      if (Array.isArray(data) && data.length > 0) {
-        var row = data[0];
-        if (row && row.content_json && Array.isArray(row.content_json.live)) return row.content_json.live;
-        if (row && Array.isArray(row.live)) return row.live;
-      }
-      return [];
     }
 
     function escapeHtml(s) {
