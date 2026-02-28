@@ -12,8 +12,14 @@
         username: '',
         deviceId: '',
         deviceKey: '',
+        playlistName: '',
         categories: [],
         channels: [],
+        movies: [],
+        movieCategories: [],
+        series: [],
+        seriesCategories: [],
+        contentType: 'live',
         currentChannel: null
     };
     VeyronApp.StateManager = {

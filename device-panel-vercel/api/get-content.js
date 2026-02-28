@@ -63,10 +63,27 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    // Cihaz m3u_url ile M3U'yu indirip kendisi parse eder; sunucu sadece URL döner
+    // CORS sorununu aşmak için M3U'yu sunucuda indirip içeriği de döndür
+    let m3u_content = null;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const fetchRes = await fetch(playlist.m3u_url, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: { 'User-Agent': 'VeyronPrime-Panel/1.0' },
+      });
+      clearTimeout(timeoutId);
+      if (fetchRes.ok) m3u_content = await fetchRes.text();
+    } catch (e) {
+      // m3u_content olmadan dönersek uygulama URL'den kendisi dener (CORS riski)
+    }
+
     json(res, 200, {
       m3u_url: playlist.m3u_url,
       playlist_name: playlist.playlist_name || null,
+      m3u_content: m3u_content || null,
       live: [],
       movies: [],
       series: [],

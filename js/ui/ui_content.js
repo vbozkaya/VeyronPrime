@@ -17,10 +17,14 @@
                 VeyronApp.ui.showLiveChannels();
                 break;
             case 'movies':
+                VeyronApp.ui.showMoviesChannels();
+                break;
             case 'series':
+                VeyronApp.ui.showSeriesChannels();
+                break;
             case 'favorites':
                 if (VeyronApp.appModals && VeyronApp.appModals.showInfoModal) {
-                    VeyronApp.appModals.showInfoModal('Bilgi', '<div class="info-row"><span>Bu bir demodur, şu an çalışmaz.</span></div>');
+                    VeyronApp.appModals.showInfoModal('Bilgi', '<div class="info-row"><span>Yakında.</span></div>');
                 }
                 break;
             default:
@@ -28,65 +32,55 @@
         }
     };
 
-    function loadContentFromBackend() {
-        if (!VeyronApp.backend || !VeyronApp.device) return Promise.resolve(false);
-        var deviceId = (VeyronApp.device.getDeviceId() || '').trim();
-        var deviceKey = (VeyronApp.device.getDeviceKey() || '').trim();
-        if (!deviceId) return Promise.resolve(false);
-        if (!VeyronApp.api.getContent || !VeyronApp.api.mapBackendContentToState) return Promise.resolve(false);
-        function tryGetContent() {
-            return VeyronApp.api.getContent(deviceId).then(function(content) {
-                if (content.live && content.live.length > 0) {
-                    VeyronApp.api.mapBackendContentToState(content);
-                    return true;
-                }
-                return false;
-            });
-        }
-        if (VeyronApp.api.checkDevice) {
-            return VeyronApp.api.checkDevice(deviceId, deviceKey)
-                .then(tryGetContent)
-                .catch(function() { return tryGetContent(); });
-        }
-        return tryGetContent();
-    }
-
-    function loadContentFromIptv() {
-        return VeyronApp.api.loadCategories().then(function() {
-            return VeyronApp.api.loadChannels();
-        });
-    }
+    var loader = VeyronApp.ui.contentLoader;
 
     /**
-     * Landing ekranındaki Güncelle butonu: Supabase'den içerik çeker, başarılıysa ana listeye gider.
+     * Landing Güncelle: sabit device id/key ile backend'den içerik dener; başarılıysa ana menüye geçer.
      */
     VeyronApp.ui.landingUpdate = function() {
         var errEl = document.getElementById('landingError');
         if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
-        VeyronApp.ui.showLoading();
-        loadContentFromBackend().then(function(usedBackend) {
-            if (usedBackend) {
-                VeyronApp.ui.switchScreen('main');
-                VeyronApp.ui.renderCategories();
-                VeyronApp.ui.renderChannels();
-                var t = document.getElementById('mainScreenTitle');
-                if (t) t.textContent = 'Canlı Yayınlar';
-                return;
-            }
+        var deviceId = (VeyronApp.State.deviceId || '').trim();
+        var deviceKey = (VeyronApp.State.deviceKey || '').trim();
+        if (!deviceId || !deviceKey) {
             if (errEl) {
-                var hasDeviceId = (VeyronApp.device && (VeyronApp.device.getDeviceId() || '').trim());
-                errEl.textContent = hasDeviceId
-                    ? 'İçerik yok. Panelden cihazı kaydedin ve M3U playlist ekleyin.'
-                    : 'Cihaz kimliği alınamadı. Lütfen uygulamayı yeniden başlatın.';
+                errEl.textContent = 'Cihaz bilgisi yok. Lütfen uygulamayı yeniden başlatın.';
                 errEl.style.display = 'block';
             }
+            return;
+        }
+        VeyronApp.ui.showLoading();
+        var registerPromise = (VeyronApp.appHandlers && VeyronApp.appHandlers.registerDeviceWithBackend)
+            ? VeyronApp.appHandlers.registerDeviceWithBackend()
+            : Promise.resolve();
+        registerPromise.then(function() {
+            return loader && loader.loadContentFromBackend ? loader.loadContentFromBackend() : Promise.resolve({ ok: false, reason: 'no_base' });
+        }).then(function(result) {
+            var res = result && typeof result.ok !== 'undefined' ? result : { ok: !!result, reason: 'network' };
+            if (res.ok) {
+                VeyronApp.ui.renderCategories();
+                VeyronApp.ui.renderChannels();
+                VeyronApp.ui.switchScreen('homeMenu');
+                return;
+            }
+            if (!errEl) return;
+            var msg = 'İçerik alınamadı.';
+            if (res.reason === 'no_playlist') {
+                msg = 'Bu cihaz için panelde playlist atanmamış. Panele (veyron-prime.vercel.app) bu ekrandaki Device ID ve Key ile giriş yapıp "Playlist ekle veya güncelle" bölümünden playlist kaydedin.';
+            } else if (res.reason === 'network') {
+                msg = 'Panele bağlanılamadı. İnternet bağlantınızı ve panel adresini kontrol edin.';
+            } else if (res.reason === 'm3u_failed') {
+                msg = 'Playlist listesi indirilemedi veya boş. Panelde kaydettiğiniz M3U linkinin erişilebilir olduğundan emin olun.';
+            } else if (res.reason === 'no_device') {
+                msg = 'Cihaz bilgisi eksik. Uygulamayı yeniden başlatın.';
+            } else {
+                msg = 'Panelden cihazı kaydedin ve playlist atayın.';
+            }
+            errEl.textContent = msg;
+            errEl.style.display = 'block';
         }).catch(function(error) {
             if (errEl) {
-                var msg = (error && error.message) ? error.message : 'Bağlantı hatası';
-                if (/missing device id/i.test(msg)) {
-                    msg = 'Cihaz kimliği alınamadı. Lütfen uygulamayı yeniden başlatın.';
-                }
-                errEl.textContent = 'Güncelleme hatası: ' + msg;
+                errEl.textContent = 'Hata: ' + (error && error.message ? error.message : 'Bağlantı hatası');
                 errEl.style.display = 'block';
             }
         }).finally(function() {
@@ -95,13 +89,75 @@
     };
 
     /**
+     * Dizileri gösterir (backend/M3U parse - group Dizi/Series olanlar)
+     */
+    VeyronApp.ui.showSeriesChannels = function() {
+        VeyronApp.State.contentType = 'series';
+        VeyronApp.ui.switchScreen('main');
+        if (!VeyronApp.State.series || VeyronApp.State.series.length === 0) {
+            VeyronApp.ui.showLoading();
+            (loader && loader.loadContentFromBackend ? loader.loadContentFromBackend() : Promise.resolve({ ok: false })).then(function(result) {
+                var usedBackend = result && result.ok;
+                if (usedBackend && VeyronApp.State.series && VeyronApp.State.series.length > 0) {
+                    VeyronApp.ui.renderSeriesCategories();
+                    VeyronApp.ui.renderSeries();
+                    var t = document.getElementById('mainScreenTitle');
+                    if (t) t.textContent = 'Diziler';
+                    return;
+                }
+                if (!VeyronApp.State.series || VeyronApp.State.series.length === 0) {
+                    VeyronApp.ui.showError('Dizi bulunamadı. M3U playlist\'te group-title="Dizi" veya "Series" olan kayıtlar dizi olarak gösterilir.');
+                    VeyronApp.ui.switchScreen('homeMenu');
+                }
+            }).finally(function() { VeyronApp.ui.hideLoading(); });
+        } else {
+            VeyronApp.ui.renderSeriesCategories();
+            VeyronApp.ui.renderSeries();
+            var t = document.getElementById('mainScreenTitle');
+            if (t) t.textContent = 'Diziler';
+        }
+    };
+
+    /**
+     * Filmleri gösterir (backend/M3U parse - group Film/VOD olanlar)
+     */
+    VeyronApp.ui.showMoviesChannels = function() {
+        VeyronApp.State.contentType = 'movies';
+        VeyronApp.ui.switchScreen('main');
+        if (!VeyronApp.State.movies || VeyronApp.State.movies.length === 0) {
+            VeyronApp.ui.showLoading();
+            (loader && loader.loadContentFromBackend ? loader.loadContentFromBackend() : Promise.resolve({ ok: false })).then(function(result) {
+                var usedBackend = result && result.ok;
+                if (usedBackend && VeyronApp.State.movies && VeyronApp.State.movies.length > 0) {
+                    VeyronApp.ui.renderMovieCategories();
+                    VeyronApp.ui.renderMovies();
+                    var t = document.getElementById('mainScreenTitle');
+                    if (t) t.textContent = 'Filmler';
+                    return;
+                }
+                if (!VeyronApp.State.movies || VeyronApp.State.movies.length === 0) {
+                    VeyronApp.ui.showError('Film bulunamadı. M3U playlist\'te group-title="Film" veya "VOD" olan kayıtlar film olarak gösterilir.');
+                    VeyronApp.ui.switchScreen('homeMenu');
+                }
+            }).finally(function() { VeyronApp.ui.hideLoading(); });
+        } else {
+            VeyronApp.ui.renderMovieCategories();
+            VeyronApp.ui.renderMovies();
+            var t = document.getElementById('mainScreenTitle');
+            if (t) t.textContent = 'Filmler';
+        }
+    };
+
+    /**
      * Canlı kanalları gösterir (önce backend, yoksa IPTV)
      */
     VeyronApp.ui.showLiveChannels = function() {
+        VeyronApp.State.contentType = 'live';
         VeyronApp.ui.switchScreen('main');
         if (VeyronApp.State.categories.length === 0 || VeyronApp.State.channels.length === 0) {
             VeyronApp.ui.showLoading();
-            loadContentFromBackend().then(function(usedBackend) {
+            (loader && loader.loadContentFromBackend ? loader.loadContentFromBackend() : Promise.resolve({ ok: false })).then(function(result) {
+                var usedBackend = result && result.ok;
                 if (usedBackend) {
                     VeyronApp.ui.renderCategories();
                     VeyronApp.ui.renderChannels();
@@ -115,7 +171,7 @@
                     VeyronApp.ui.switchScreen('homeMenu');
                     return;
                 }
-                return loadContentFromIptv().then(function() {
+                return (loader && loader.loadContentFromIptv ? loader.loadContentFromIptv() : Promise.resolve()).then(function() {
                     VeyronApp.ui.renderCategories();
                     VeyronApp.ui.renderChannels();
                     var titleEl = document.getElementById('mainScreenTitle');
@@ -123,7 +179,7 @@
                 });
             }).catch(function(error) {
                 if (VeyronApp.State.apiUrl && VeyronApp.State.username) {
-                    return loadContentFromIptv().then(function() {
+                    return (loader && loader.loadContentFromIptv ? loader.loadContentFromIptv() : Promise.resolve()).then(function() {
                         VeyronApp.ui.renderCategories();
                         VeyronApp.ui.renderChannels();
                         var t = document.getElementById('mainScreenTitle');
@@ -145,64 +201,5 @@
             var titleEl = document.getElementById('mainScreenTitle');
             if (titleEl) titleEl.textContent = 'Canlı Yayınlar';
         }
-    };
-
-    /**
-     * IPTV/Backend verilerini günceller
-     */
-    VeyronApp.ui.updateData = function() {
-        var updateBtn = document.getElementById('updateBtn');
-        if (updateBtn) {
-            updateBtn.classList.add('updating');
-            updateBtn.disabled = true;
-        }
-        VeyronApp.ui.showLoading();
-        loadContentFromBackend().then(function(usedBackend) {
-            if (usedBackend) {
-                if (VeyronApp.State.currentScreen === 'main') {
-                    VeyronApp.ui.renderCategories();
-                    VeyronApp.ui.renderChannels();
-                }
-                return;
-            }
-            if (!VeyronApp.State.apiUrl || !VeyronApp.State.username) return;
-            return loadContentFromIptv();
-        }).then(function() {
-            if (VeyronApp.State.currentScreen === 'main') {
-                VeyronApp.ui.renderCategories();
-                VeyronApp.ui.renderChannels();
-            }
-            var channelInfo = document.getElementById('channelInfo');
-            if (channelInfo) {
-                var originalText = channelInfo.textContent;
-                channelInfo.textContent = 'Veriler güncellendi!';
-                channelInfo.classList.remove('error');
-                channelInfo.style.color = '#4CAF50';
-                setTimeout(function() {
-                    channelInfo.textContent = originalText;
-                    channelInfo.style.color = '';
-                }, (window.VeyronApp.Constants && window.VeyronApp.Constants.UI_MESSAGE_ERROR_DURATION_MS) || 2000);
-            }
-        }).catch(function(error) {
-            var channelInfo = document.getElementById('channelInfo');
-            if (channelInfo) {
-                channelInfo.textContent = 'Güncelleme hatası: ' + (error && error.message ? error.message : 'Bilinmeyen hata');
-                channelInfo.classList.add('error');
-                channelInfo.style.color = '#f44336';
-                setTimeout(function() {
-                    channelInfo.classList.remove('error');
-                    channelInfo.style.color = '';
-                    if (VeyronApp.State.currentChannel) {
-                        channelInfo.textContent = VeyronApp.State.currentChannel.name || 'Bilinmeyen Kanal';
-                    }
-                }, (window.VeyronApp.Constants && window.VeyronApp.Constants.UI_HIDE_ERROR_DELAY_MS) || 3000);
-            }
-        }).finally(function() {
-            VeyronApp.ui.hideLoading();
-            if (updateBtn) {
-                updateBtn.classList.remove('updating');
-                updateBtn.disabled = false;
-            }
-        });
     };
 })();
